@@ -1,2 +1,2 @@
-# timetrackingsummarizer
-A tool to process timetracking text files. A cli is offered. It produces summaries and a snakey diagram.
+# Time Tracking Summarizer
+A CLI tool to process timetracking text files. It produces summaries and a snakey diagram.
