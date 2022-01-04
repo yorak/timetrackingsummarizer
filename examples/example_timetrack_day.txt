@@ -1,0 +1,15 @@
+*Tue 04.01.2022*
+10:00-10:10	@Plan some @DailyTasks ( @AIS + @FIT )
+10:10-10:25	@Read on GPT @AI models ( @AIS + @RES )
+10:25-10:30	@Implement @Tools to @Analyze @Timetracking data ( @FIT + @DIG + @AIS )
+Break
+10:45-11:00	@Research parallax scrolling for the company @Homepage ( @AIS )
+11:00-12:00	@Implement @Tools to @Analyze @Timetracking data ( @FIT + @DIG + @AIS )
+Break
+12:15-12:30	@Review the quality of past @Timetracking data ( @FIT + @DIG + @AIS )
+Break to clean up files
+12:50-13:00 	@Analyze @Timetracking data ( @FIT + @DIG + @AIS )
+Lunch
+13:15-13:20	@Timetracking  ( @FIT + @DIG + @AIS )
+13:20-13:25	@Emails to @Read ( @DIG )
+13:25-13:40 	Do some additional @Timetracking ( @FIT + @DIG + @AIS )
