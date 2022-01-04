@@ -33,7 +33,7 @@ def get_categories_from(line):
     cats = []
     if (start_cats!=-1 and end_cats!=-1):
         cats = [c.strip() 
-            for c in re.split(r'/|\+', line[start_cats+1:end_cats])
+            for c in re.split(r'/|\+| |, ', line[start_cats+1:end_cats])
             if tag_re.match(c.strip())]
     return cats
 

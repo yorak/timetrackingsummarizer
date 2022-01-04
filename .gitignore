@@ -130,3 +130,8 @@ dmypy.json
 
 #Vscode
 .vscode/
+
+
+# My settings / data
+my_tag_aliases.txt
+temp-plot.html
