@@ -41,6 +41,7 @@ if __name__=='__main__':
     argparser.add_argument("--lnexcl", dest='line_excls', action='append', help="Only consider records with this text")
     argparser.add_argument("--s2m", dest='scale_to_mins', help="Scale minutes so that the total is this")
     argparser.add_argument("--snakey", dest='plot_snakey', action='store_true', help="Produce a snakey plot")
+    argparser.add_argument("--activity", dest='by_activity', action='store_true', help="Show by activity")
     argparser.add_argument("--count_tags", dest='count_tags', action='store_true', help="Only show tags and their counts")
     argparser.add_argument('--taf', dest='tag_alias_file', type=argparse.FileType('r'), help="A text file with each line containing some @ReadTag=@Alias rule")
     args = argparser.parse_args()
@@ -77,19 +78,48 @@ if __name__=='__main__':
             print(tag_count, tag)
         exit()
 
+    # Check for special tag
+    ALL_tag_cats = []
+    all_cats = set()
+    for line in all_lines:
+        if lineparser.is_timelog_line(line):            
+            all_cats = all_cats.union(lineparser.get_categories_from(line))
+    if '@ALL' in all_cats:
+        all_cats.remove('@ALL')
+        ALL_tag_cats = list(all_cats)
+
     if args.plot_snakey:
         ttpc = lineparser.parse_and_summarize(all_lines, args.cat,
             also_tags=True, tag_translator=tag_to_tag, do_print=False )
         from timetracking_snakey_plotter import plot_timetracking_data
         plot_timetracking_data(ttpc)
 
+    if args.by_activity:
+        print("BY ACTIVITY:")
+        ttpc = lineparser.parse_and_summarize(all_lines, args.cat,
+            also_tags=True, tag_translator=tag_to_tag, do_print=False )
+        for cat, cat_data in sorted(ttpc.items()):
+            cat_minutes, activities = cat_data
+            print("CAT", cat, min2str(int(cat_minutes)))
+            for act, act_data in sorted(activities.items()):
+                act_minutes, _ = act_data
+                if act_minutes>0:
+                    percentage = act_minutes/cat_minutes*100
+                    act_hourss = min2str(int(act_minutes))
+                    print(f"  {act} {act_hourss} ({percentage:.1f}%)")
+            
+
     else:
         min_scaler = 1.0
         if args.scale_to_mins:
-            total_mins = sum( lineparser.parse_and_summarize(all_lines, args.cat, do_print=False).values() )
+            total_mins = sum( lineparser.parse_and_summarize(all_lines, args.cat, 
+                        all_tags_replacement=ALL_tag_cats, do_print=False).values() )
             min_scaler = float(args.scale_to_mins)/total_mins
+        
         tpc = lineparser.parse_and_summarize(all_lines, args.cat, 
-                duration_scaler=min_scaler, min2str=min2str ) 
+                duration_scaler=min_scaler,
+                all_tags_replacement=ALL_tag_cats,
+                min2str=min2str ) 
         print()
         print("TOTAL:")
         tot_tot_mins = 0

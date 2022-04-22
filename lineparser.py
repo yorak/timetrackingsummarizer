@@ -37,8 +37,13 @@ def get_categories_from(line):
             if tag_re.match(c.strip())]
     return cats
 
+def flatten(t):
+    return [item for sublist in t for item in sublist]
+
 def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
-                        also_tags=False, tag_translator=lambda tag:tag,
+                        also_tags=False,
+                        all_tags_replacement=[],
+                        tag_translator=lambda tag:tag,
                         do_print=True, min2str=lambda min:int(min)):
     """ Process the lines to timetracking records.
 
@@ -57,8 +62,10 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
        All times are scaled using this multiplier before printing and storing.
     also_tags : `bool`
        Produce a more detailed data also containing by-tag summaries.
+    all_tags_replacement : `list`
+       Can be used to alias 'ALL' category to serveral. 
     tag_translator : `callable`
-       Can be used to alias tags to anohter.
+       Can be used to alias tags to another (maybe even serveral).
     do_print : `bool`
        Output summaries to stdout.
     
@@ -106,6 +113,11 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                 daily_minutes += td_min
 
                 cats = get_categories_from(line)
+                if '@ALL' in cats and all_tags_replacement:
+                    cats+=all_tags_replacement
+                    cats.remove('@ALL')
+                #print(cats, all_tags_replacement)
+                
                 if not cats and do_print:
                     print("Warning, no categories on", prev_date, "line:", line)
                 
@@ -144,9 +156,9 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                             for s_tag in specifier_tags:
                                 total_per_cat[cat][1][activity_tag][1][s_tag] += td_min/len(cats)/len(activity_tags)/len(specifier_tags)*duration_scaler
                     else:
-                        total_per_cat[cat]+=td_min/len(cats)*duration_scaler
+                        total_per_cat[cat]+=td_min/len(cats)
 
-                    daily_cat_minutes+=td_min/len(cats)*duration_scaler
+                    daily_cat_minutes+=td_min/len(cats)
 
         except BaseException as e:
             print( "Problem on line with content: ", line)
