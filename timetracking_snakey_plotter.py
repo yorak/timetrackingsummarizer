@@ -9,7 +9,7 @@ def _mins_to_hours(mins):
     remaining_minutes = int(mins-total_hours*60)
     return f"{total_hours}:{remaining_minutes:02d}"
 
-def plot_timetracking_data(data):
+def plot_timetracking_data(data, plot_specifiers = True):
     """ Plots the timetracking data as a snakey diagram.
     
     Does not return anything, but shows the resulting diagram in a new browser
@@ -48,17 +48,18 @@ def plot_timetracking_data(data):
                 targets.append(act)
                 values.append(act_minutes)
         
-        for act, act_data in sorted(activities.items()):
-            _, specifiers = act_data
-            if not specifiers:
-                specifiers["None specified"] = 1
-            for spc, spc_minutes in sorted(specifiers.items()):
-                spc_label = "specifier_"+spc
-                if not spc_label in spc_labels: spc_labels.append(spc_label)
-                sources.append(act)
-                targets.append(spc_label)
-                values.append(spc_minutes)
-    
+        if plot_specifiers:
+            for act, act_data in sorted(activities.items()):
+                _, specifiers = act_data
+                if not specifiers:
+                    specifiers["None specified"] = 1
+                for spc, spc_minutes in sorted(specifiers.items()):
+                    spc_label = "specifier_"+spc
+                    if not spc_label in spc_labels: spc_labels.append(spc_label)
+                    sources.append(act)
+                    targets.append(spc_label)
+                    values.append(spc_minutes)
+        
     labels = list(sorted(cat_labels)) +\
                 list(sorted(act_labels)) +\
                 list(sorted(spc_labels))

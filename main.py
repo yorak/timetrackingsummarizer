@@ -39,8 +39,10 @@ if __name__=='__main__':
     argparser.add_argument("--cat", dest='cat', help="Only show this category/project")
     argparser.add_argument("--lnincl", dest='line_incls', action='append', help="Only consider records with this text")
     argparser.add_argument("--lnexcl", dest='line_excls', action='append', help="Only consider records with this text")
+    argparser.add_argument("--show_included", dest='show_included', action='store_true', help="Show included lines")
     argparser.add_argument("--s2m", dest='scale_to_mins', help="Scale minutes so that the total is this")
     argparser.add_argument("--snakey", dest='plot_snakey', action='store_true', help="Produce a snakey plot")
+    argparser.add_argument("--no_snakey_specifiers", dest='no_snakey_specifiers', action='store_true', help="Hide specifiers from snakey plot")
     argparser.add_argument("--activity", dest='by_activity', action='store_true', help="Show by activity")
     argparser.add_argument("--count_tags", dest='count_tags', action='store_true', help="Only show tags and their counts")
     argparser.add_argument('--taf', dest='tag_alias_file', type=argparse.FileType('r'), help="A text file with each line containing some @ReadTag=@Alias rule")
@@ -57,6 +59,9 @@ if __name__=='__main__':
             all_lines+=open(fn).readlines()
     if args.line_incls or args.line_excls:
         all_lines = _filter_lines(all_lines, args.line_incls, args.line_excls)
+        if args.show_included:
+            for l in all_lines: print(l)
+            
 
     tag_alias_rules = {}
     if args.tag_alias_file:
@@ -92,12 +97,14 @@ if __name__=='__main__':
         ttpc = lineparser.parse_and_summarize(all_lines, args.cat,
             also_tags=True, tag_translator=tag_to_tag, do_print=False )
         from timetracking_snakey_plotter import plot_timetracking_data
-        plot_timetracking_data(ttpc)
+        plot_timetracking_data(ttpc, not args.no_snakey_specifiers)
 
     if args.by_activity:
         print("BY ACTIVITY:")
         ttpc = lineparser.parse_and_summarize(all_lines, args.cat,
             also_tags=True, tag_translator=tag_to_tag, do_print=False )
+
+        
         for cat, cat_data in sorted(ttpc.items()):
             cat_minutes, activities = cat_data
             print("CAT", cat, min2str(int(cat_minutes)))
