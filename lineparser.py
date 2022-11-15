@@ -25,7 +25,10 @@ def get_tags(line, tag_translator=lambda tag:tag):
 
 def is_timelog_line(line):
     """Helper to determine if the line contains timelog data."""
-    return True if line_re.match(line) else False
+    return True if line_re.match(line.strip()) else False
+
+def is_date_line(line):
+    return True if date_re.match(line.replace("*","")) else False
 
 def get_categories_from(line):
     start_cats = line.rfind("(")
@@ -71,6 +74,8 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
     
     Returns
     -------
+    A dictionary with total hours per category (key). Or a more complex
+    datastructure (see impl.) also_tags is enabled.
 
     """
     daily_minutes, daily_cat_minutes, daily_notes = 0, 0, ""
@@ -81,8 +86,7 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
     
     for line in lines:
         try:
-            do = date_re.match(line.replace("*",""))
-            if do:
+            if is_date_line(line):
                 #print("match do", line)
                 if daily_minutes>0 and do_print:
                     if only_cat:
@@ -130,8 +134,8 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                                 for tag in and_tag_re.findall(line)
                                 if tag not in cats]
 
-                    specifier_tags = []
                     activity_tags = []
+                    specifier_tags = []
                     if tags:
                         activity_tags = [tags[0]] + and_tags
                         specifier_tags = [tag for tag in tags[1:]
@@ -147,14 +151,15 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                         total_per_cat[cat] = 0 if not also_tags else [0, {}]
                     daily_notes += line[:line.rfind("(")-1].strip("0123456789:.-\t ")+"; "
 
-                    if also_tags and tags:
+                    if also_tags:
                         total_per_cat[cat][0]+=td_min/len(cats) 
-                        for activity_tag in activity_tags:
-                            if not activity_tag in total_per_cat[cat][1]:
-                                total_per_cat[cat][1][activity_tag] = [0, defaultdict(int)]
-                            total_per_cat[cat][1][activity_tag][0]+=td_min/len(cats)/len(activity_tags)*duration_scaler
-                            for s_tag in specifier_tags:
-                                total_per_cat[cat][1][activity_tag][1][s_tag] += td_min/len(cats)/len(activity_tags)/len(specifier_tags)*duration_scaler
+                        if tags:
+                            for activity_tag in activity_tags:
+                                if not activity_tag in total_per_cat[cat][1]:
+                                    total_per_cat[cat][1][activity_tag] = [0, defaultdict(int)]
+                                total_per_cat[cat][1][activity_tag][0]+=td_min/len(cats)/len(activity_tags)*duration_scaler
+                                for s_tag in specifier_tags:
+                                    total_per_cat[cat][1][activity_tag][1][s_tag] += td_min/len(cats)/len(activity_tags)/len(specifier_tags)*duration_scaler
                     else:
                         total_per_cat[cat]+=td_min/len(cats)
 

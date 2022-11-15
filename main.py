@@ -19,7 +19,9 @@ def _filter_lines(all_lines, line_incls, line_excls):
     filtered_lines = []
     for l in all_lines:
         if not lineparser.is_timelog_line(l):
-            filtered_lines.append(l)
+            if lineparser.is_date_line(l):
+                filtered_lines.append(l)
+            pass
         elif line_incls and all( [(lf in l) for lf in line_incls] ):
             if not line_excls or all( [(not lf in l) for lf in line_excls] ):
                 filtered_lines.append(l)
