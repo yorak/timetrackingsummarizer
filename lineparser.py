@@ -28,7 +28,7 @@ def is_timelog_line(line):
     return True if line_re.match(line.strip()) else False
 
 def is_date_line(line):
-    return True if date_re.match(line.replace("*","")) else False
+    return True if date_re.match(line.strip('*_ ')) else False
 
 def get_categories_from(line):
     start_cats = line.rfind("(")
@@ -90,13 +90,13 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                 #print("match do", line)
                 if daily_minutes>0 and do_print:
                     if only_cat:
-                        print(prev_date, min2str(daily_cat_minutes),
+                        print(prev_date, ":", min2str(daily_cat_minutes),
                               ":", daily_notes.replace("@", ""), "\n")
                     else:
-                        print(prev_date, min2str(daily_minutes))
+                        print(prev_date, ":", min2str(daily_minutes))
 
                 daily_minutes, daily_cat_minutes, daily_notes = 0, 0, ""
-                prev_date, prev_time_to = line, datetime.fromtimestamp(0)
+                prev_date, prev_time_to = line.strip('*_ \n'), datetime.fromtimestamp(0)
                 continue
 
             mo = line_re.match(line)
@@ -171,8 +171,8 @@ def parse_and_summarize(lines, only_cat=None, duration_scaler=1.0,
                     
     if daily_minutes>0 and do_print:
         if only_cat:
-            print(prev_date, min2str(daily_cat_minutes), ":", daily_notes.replace("@", ""), "\n")
+            print(prev_date, ":", min2str(daily_cat_minutes), ":", daily_notes.replace("@", ""), "\n")
         else:
-            print(prev_date, min2str(daily_minutes))
+            print(prev_date, ":", min2str(daily_minutes))
 
     return total_per_cat
